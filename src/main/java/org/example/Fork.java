@@ -1,35 +1,64 @@
 package org.example;
 
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
+import javax.swing.*;
+import java.awt.*;
 
-public class Fork {
-    // Fair Lock למניעת starvation (הרעבה) של פילוסופים
-    private final ReentrantLock lock = new ReentrantLock(true);
-    private volatile int ownerId = -1;
+public class Fork extends JPanel {
+    private int number;
+    private Philosof heldBy;
+    private final int originalX;
+    private final int originalY;
 
-    public boolean tryTake(int philosopherId) throws InterruptedException {
-        // ניסיון תפיסה קצר של עד 100 מילישניות לפי דרישות המטלה
-        boolean success = lock.tryLock(100, TimeUnit.MILLISECONDS);
-        if (success) {
-            ownerId = philosopherId;
+    public Fork(int number, int x, int y){
+        this.number = number;
+        this.originalX = x;
+        this.originalY = y;
+
+        // גודל אחיד וריבועי לכל המזלגות כדי שיתאימו לכל זווית במעגל
+        this.setBounds(x, y, 16, 16);
+
+        this.setOpaque(false);
+        this.heldBy = null;
+    }
+
+    public String toString(){
+        if (this.heldBy == null){
+            return "This fork is not held by anyone!";
         }
-        return success;
+        return "Fork " + this.number + " is currently held by " + this.heldBy.getName();
     }
 
-    public void release() {
-        // משחררים רק אם החוט הנוכחי הוא זה שנועל את המזלג
-        if (lock.isHeldByCurrentThread()) {
-            ownerId = -1; // איפוס קריטי לצורך הציור הגרפי
-            lock.unlock();
+    public void setHeldBy(Philosof philosof){
+        this.heldBy = philosof;
+
+        if (philosof != null) {
+            // מציב את המזלג בדיוק במרכז הריבוע של הפילוסוף (ריבוע של 60x60)
+            int x = philosof.getX() + (philosof.getWidth() / 2) - (this.getWidth() / 2);
+            int y = philosof.getY() + (philosof.getHeight() / 2) - (this.getHeight() / 2);
+            this.setLocation(x, y);
+        } else {
+            this.setLocation(originalX, originalY);
         }
+
+        repaint();
     }
 
-    public boolean isTaken() {
-        return lock.isLocked();
+    public int getNumber(){
+        return this.number;
     }
 
-    public int getOwnerId() {
-        return ownerId;
+    public Philosof getHeldBy(){
+        return this.heldBy;
+    }
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        if(heldBy == null){
+            g.setColor(Color.DARK_GRAY);
+        }
+        else{
+            g.setColor(Color.ORANGE);
+        }
+        g.fillRect(0, 0, getWidth(), getHeight());
     }
 }
