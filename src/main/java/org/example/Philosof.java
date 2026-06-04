@@ -24,7 +24,6 @@ public class Philosof extends JPanel {
         this.setBounds(x, y, 60, 60);
         this.setOpaque(false);
 
-
         this.name = name;
         this.status = THINKING;
         this.eatingCount = 0;
@@ -41,7 +40,7 @@ public class Philosof extends JPanel {
         switch (this.status){
             case THINKING -> statusText = "Thinking";
             case WAITING_FOR_FORK_1 -> statusText = "Waiting for fork 1";
-            case WAITING_FOR_FORK_2 -> statusText = "Waiting for fork 1";
+            case WAITING_FOR_FORK_2 -> statusText = "Waiting for fork 2";
             case EATING -> statusText = "Eating";
             case DEAD -> statusText =  "Murdered";
         }
@@ -49,46 +48,56 @@ public class Philosof extends JPanel {
                 this.eatingCount + ").";
     }
 
-
-
     private void start () {
         new Thread(() -> {
             Random random = new Random();
             while (this.isRunning) {
                 Utils.sleep(random.nextInt(5000));
                 if (!isRunning) break;
+
                 while (!waiter.requestPermission(this)){
                     Utils.sleep(100);
                 }
+
                 this.status = WAITING_FOR_FORK_1;
+
                 while (this.fork1.getHeldBy() != null) {
                     Utils.sleep(100);
                 }
                 this.fork1.setHeldBy(this);
+
                 Utils.sleep(random.nextInt(1000));
                 if (!isRunning) break;
+
                 this.status = WAITING_FOR_FORK_2;
+
                 while (this.fork2.getHeldBy() != null) {
                     Utils.sleep(100);
                 }
                 this.fork2.setHeldBy(this);
+
                 this.status = EATING;
                 repaint();
+
                 Utils.sleep(random.nextInt(1000));
                 if (!isRunning) break;
+
                 this.fork1.setHeldBy(null);
                 this.fork2.setHeldBy(null);
                 waiter.doneEating(this);
+
                 this.eatingCount++;
                 this.status = THINKING;
                 repaint();
             }
+
             if (this.fork1.getHeldBy() == this) {
                 this.fork1.setHeldBy(null);
             }
             if (this.fork2.getHeldBy() == this) {
                 this.fork2.setHeldBy(null);
             }
+
             this.status = DEAD;
             waiter.doneEating(this);
         }).start();
@@ -120,9 +129,10 @@ public class Philosof extends JPanel {
         }
         g.fillRect(0, 0, getWidth(), getHeight());
     }
+
     public void revive() {
         this.isRunning = true;
-        this.status = THINKING; // מחזירים למצב חשיבה
-        this.start(); // מפעילים את ה-Thread מחדש
+        this.status = THINKING;
+        this.start();
     }
 }

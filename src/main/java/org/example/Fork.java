@@ -14,7 +14,6 @@ public class Fork extends JPanel {
         this.originalX = x;
         this.originalY = y;
 
-        // גודל אחיד וריבועי לכל המזלגות כדי שיתאימו לכל זווית במעגל
         this.setBounds(x, y, 16, 16);
 
         this.setOpaque(false);
@@ -32,7 +31,6 @@ public class Fork extends JPanel {
         this.heldBy = philosof;
 
         if (philosof != null) {
-            // מציב את המזלג בדיוק במרכז הריבוע של הפילוסוף (ריבוע של 60x60)
             int x = philosof.getX() + (philosof.getWidth() / 2) - (this.getWidth() / 2);
             int y = philosof.getY() + (philosof.getHeight() / 2) - (this.getHeight() / 2);
             this.setLocation(x, y);

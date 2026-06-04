@@ -18,12 +18,12 @@ public class Waiter {
         }
         return false;
     }
-    // בתוך מחלקת Waiter:
+
     public synchronized void setMaxEating(int maxEating) {
         this.maxEating = maxEating;
-        // מנקים את רשימת המורשים הישנה כדי למנוע מצבי נעילה במעבר בין שולחנות
         this.allowedList.clear();
     }
+
     public void plusMaxEating() {
         this.maxEating++;
     }
